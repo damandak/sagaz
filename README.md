@@ -3,6 +3,7 @@
 
 ## Requirements
 Built in Django 4.0.4 and Python 3.8
+
 Frontend is built in Vue 3: [Git Repository](https://pages.github.com/)
 
 ## Installation
