@@ -1,0 +1,12 @@
+*.pyc  
+*~  
+__pycache__  
+myvenv  
+db.sqlite3  
+/static  
+.DS_Store
+bin/
+lib/
+node_modules/
+pyvenv.cfg
+sagaz/sagaz/settings/production.py
