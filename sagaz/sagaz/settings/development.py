@@ -9,6 +9,8 @@ SECRET_KEY = 'django-insecure-r$8agt-+!l(lzt843(j_@w%m-n&t1o6w_hc(@x&9_m_u_e!k)8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = []
+
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -22,3 +24,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+STATIC_URL = 'static/'
