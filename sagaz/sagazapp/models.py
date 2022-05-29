@@ -3,6 +3,12 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
 
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
@@ -41,7 +47,7 @@ class UserManager(BaseUserManager):
             user.save(using=self._db)
         return user
 
-class Lake(models.Model):
+class Lake(BaseModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     sagaz_id = models.CharField(max_length=255, blank=True, null=True, unique=True) # id that comes from the API
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -70,7 +76,7 @@ class Lake(models.Model):
     def get_health_status(self):
         return self.HEALTH_CHOICES[self.health_status][1]
 
-class LakeMeasurement(models.Model):
+class LakeMeasurement(BaseModel):
     lake = models.ForeignKey(Lake, on_delete=models.CASCADE)
     date = models.DateTimeField(blank=False, null=False)
 
@@ -89,5 +95,3 @@ class LakeMeasurement(models.Model):
         (RED, 'Roja'),
     )
     alert_status = models.IntegerField(choices=STATUS_CHOICES, blank=True, null=True) # HISTÓRICO
-
-

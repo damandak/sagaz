@@ -3,11 +3,24 @@ from rest_framework.serializers import SerializerMethodField
 
 from .models import Lake,LakeMeasurement
 
-
 class LakeSerializer(serializers.ModelSerializer):
+    sagaz_id = serializers.CharField(max_length=100)
     class Meta:
         model = Lake
-        fields = '__all__'
+        fields = ('name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'station_status')
+
+    def create(self, validated_data):
+        old_lake = Lake.objects.filter(sagaz_id=validated_data['sagaz_id']).first()
+        if old_lake is not None:
+            if 'area' in validated_data:
+                old_lake.area = validated_data['area']
+            if 'volume' in validated_data:
+                old_lake.volume = validated_data['volume']
+            if 'station_status' in validated_data:
+                old_lake.station_status = validated_data['station_status']
+            old_lake.save()
+            return old_lake
+        return Lake.objects.create(**validated_data)
 
 class LakeMeasurementSerializer(serializers.ModelSerializer):
     class Meta:
