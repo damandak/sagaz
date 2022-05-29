@@ -4,7 +4,7 @@ from rest_framework.serializers import SerializerMethodField
 from .models import Lake,LakeMeasurement
 
 class LakeSerializer(serializers.ModelSerializer):
-    sagaz_id = serializers.CharField(max_length=100)
+    sagaz_id = serializers.CharField(max_length=100, required=True)
     class Meta:
         model = Lake
         fields = ('name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'station_status')
