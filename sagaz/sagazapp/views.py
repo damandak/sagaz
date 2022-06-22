@@ -59,7 +59,7 @@ class LakeMeasurementsViews(APIView):
 
     def post(self, request, format=None):
         sagaz_id = request.data['sagaz_id']
-        new_data = request.data
+        new_data = request.data.copy()
         if Lake.objects.filter(sagaz_id=sagaz_id).exists():
             lake = Lake.objects.get(sagaz_id=sagaz_id)
             new_data['lake'] = lake.id

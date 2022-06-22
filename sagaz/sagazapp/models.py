@@ -53,12 +53,12 @@ class Lake(BaseModel):
     country = models.CharField(max_length=255, blank=True, null=True)
     region = models.CharField(max_length=255, blank=True, null=True) # political region in country
     # Location data
-    lat = models.FloatField(blank=True, null=True)
-    lon = models.FloatField(blank=True, null=True)
-    altitude = models.FloatField(blank=True, null=True) # in meters
+    lat = models.FloatField(blank=True, null=True, verbose_name="Latitude (decimal degrees)")
+    lon = models.FloatField(blank=True, null=True, verbose_name="Longitude (decimal degrees)")
+    altitude = models.FloatField(blank=True, null=True, verbose_name="Altitude (meters)") # in meters
     # Dynamic fields
-    area = models.FloatField(blank=True, null=True) # km2 - NO HISTÓRICO
-    volume = models.FloatField(blank=True, null=True) # water volume in cubic meters - NO HISTÓRICO
+    area = models.FloatField(blank=True, null=True, verbose_name="Area (square kilometers)") # km2 - NO HISTÓRICO
+    volume = models.FloatField(blank=True, null=True, verbose_name="Water Volume (millions of cubic meters)") # water volume in cubic meters - NO HISTÓRICO
     ACTIVE = 0
     INACTIVE = 1
     STATION_CHOICES = (
@@ -80,11 +80,11 @@ class LakeMeasurement(BaseModel):
     lake = models.ForeignKey(Lake, on_delete=models.CASCADE)
     date = models.DateTimeField(blank=False, null=False)
 
-    water_level = models.FloatField(blank=True, null=True) # in meters
-    water_temperature = models.FloatField(blank=True, null=True) # in Celsius
-    atmospheric_pressure = models.FloatField(blank=True, null=True) # in hPa
-    atmospheric_temperature = models.FloatField(blank=True, null=True) # in Celsius
-    precipitation = models.FloatField(blank=True, null=True) # in mm
+    water_level = models.FloatField(blank=True, null=True, verbose_name="Water Level (meters)") # in meters
+    water_temperature = models.FloatField(blank=True, null=True, verbose_name="Water Temperature (Celsius") # in Celsius
+    atmospheric_pressure = models.FloatField(blank=True, null=True, verbose_name="Atmospheric Pressure (hPa)") # in hPa
+    atmospheric_temperature = models.FloatField(blank=True, null=True, verbose_name="Atmospheric Temperature (Celsius)") # in Celsius
+    precipitation = models.FloatField(blank=True, null=True, verbose_name="Precipitation (milimeters)") # in mm
 
     GREEN = 0
     YELLOW = 1
