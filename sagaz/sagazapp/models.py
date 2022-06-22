@@ -59,6 +59,7 @@ class Lake(BaseModel):
     # Dynamic fields
     area = models.FloatField(blank=True, null=True, verbose_name="Area (square kilometers)") # km2 - NO HISTÓRICO
     volume = models.FloatField(blank=True, null=True, verbose_name="Water Volume (millions of cubic meters)") # water volume in cubic meters - NO HISTÓRICO
+    warning = models.CharField(max_length=255, blank=True, null=True, verbose_name="Warning and description")
     ACTIVE = 0
     INACTIVE = 1
     STATION_CHOICES = (

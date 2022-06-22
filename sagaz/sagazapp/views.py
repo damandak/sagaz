@@ -44,7 +44,6 @@ class LakesViews(APIView):
         new_data = request.data
         if Lake.objects.filter(sagaz_id=sagaz_id).exists():
             serializer = LakeSerializer(data=new_data)
-            print(serializer)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
