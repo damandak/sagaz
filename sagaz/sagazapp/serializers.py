@@ -5,9 +5,10 @@ from .models import Lake,LakeMeasurement
 
 class LakeSerializer(serializers.ModelSerializer):
     sagaz_id = serializers.CharField(max_length=100, required=True)
+    image = serializers.SerializerMethodField()
     class Meta:
         model = Lake
-        fields = ('name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'station_status')
+        fields = ('id', 'image', 'name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'station_status')
 
     def create(self, validated_data):
         old_lake = Lake.objects.filter(sagaz_id=validated_data['sagaz_id']).first()
@@ -21,6 +22,13 @@ class LakeSerializer(serializers.ModelSerializer):
             old_lake.save()
             return old_lake
         return Lake.objects.create(**validated_data)
+
+    def get_image(self, lake):
+        request = self.context.get('request')
+        if request is None:
+          return ""
+        image = lake.image.url
+        return request.build_absolute_uri(image)
 
 class LakeMeasurementSerializer(serializers.ModelSerializer):
     class Meta:

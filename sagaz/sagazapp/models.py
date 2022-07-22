@@ -49,6 +49,7 @@ class UserManager(BaseUserManager):
 
 class Lake(BaseModel):
     name = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(upload_to='lake_images', blank=True, null=True)
     sagaz_id = models.CharField(max_length=255, blank=True, null=True, unique=True) # id that comes from the API
     country = models.CharField(max_length=255, blank=True, null=True)
     region = models.CharField(max_length=255, blank=True, null=True) # political region in country

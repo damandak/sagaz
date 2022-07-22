@@ -139,3 +139,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 
+MEDIA_ROOT = BASE_DIR / 'sagaz/lake_images'
+MEDIA_URL = 'sagaz/lake_images/'
