@@ -27,7 +27,7 @@ class LakeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None:
           return ""
-        image = lake.image.url
+        image = lake.image.url if lake.image else ""
         return request.build_absolute_uri(image)
 
 class LakeMeasurementSerializer(serializers.ModelSerializer):

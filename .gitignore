@@ -10,3 +10,6 @@ lib/
 node_modules/
 pyvenv.cfg
 sagaz/sagaz/settings/production.py
+sagaz/GDAL-3.5.1/
+sagaz/GDAL-3.5.1.tar.gz
+sagaz/lake_images/

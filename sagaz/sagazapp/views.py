@@ -106,9 +106,6 @@ class LakeMeasurementsViews(APIView):
         measurements = LakeMeasurement.objects.filter(lake=lake).order_by('date')
     except:
       # respond with a 404 error message
-      print(interval)
-      print(pk)
-      print(lake)
       return HttpResponse(status=404)  
     # serialize the lake
     serializer = LakeMeasurementSerializer(measurements, many=True)
