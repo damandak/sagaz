@@ -94,13 +94,15 @@ class LakeMeasurementsViews(APIView):
     try:
       # obtain the lake with the passed id.
       lake = Lake.objects.get(pk=pk)
-      if interval == 'day':
+      if interval == 'daily':
         measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=1)).order_by('date')
-      elif interval == 'week':
+      elif interval == 'weekly':
         measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=7)).order_by('date')
-      elif interval == 'month':
+      elif interval == 'biweekly':
+        measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=14)).order_by('date')
+      elif interval == 'monthly':
         measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=30)).order_by('date')
-      elif interval == 'year':
+      elif interval == 'yearly':
         measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=365)).order_by('date')
       elif interval == 'all':
         measurements = LakeMeasurement.objects.filter(lake=lake).order_by('date')

@@ -1,6 +1,5 @@
 from rest_framework import routers,serializers,viewsets
 from rest_framework.serializers import SerializerMethodField
-
 from .models import Lake,LakeMeasurement
 
 class LakeSerializer(serializers.ModelSerializer):
@@ -26,7 +25,7 @@ class LakeSerializer(serializers.ModelSerializer):
     def get_image(self, lake):
         request = self.context.get('request')
         if request is None:
-          return ""
+            return "https://www.sagaz.org/media/" + lake.image.url if lake.image else ""
         image = lake.image.url if lake.image else ""
         return request.build_absolute_uri(image)
 

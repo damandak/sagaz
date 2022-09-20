@@ -59,17 +59,9 @@ class Lake(BaseModel):
     altitude = models.FloatField(blank=True, null=True, verbose_name="Altitude (meters)") # in meters
     # Dynamic fields
     area = models.FloatField(blank=True, null=True, verbose_name="Area (square kilometers)") # km2 - NO HISTÓRICO
-    volume = models.FloatField(blank=True, null=True, verbose_name="Water Volume (millions of cubic meters)") # water volume in cubic meters - NO HISTÓRICO
+    volume = models.FloatField(blank=True, null=True, verbose_name="Water Volume (millions of cubic meters)") # water volume in millions of cubic meters - NO HISTÓRICO
     warning = models.CharField(max_length=255, blank=True, null=True, verbose_name="Warning and description")
-    ACTIVE = 0
-    INACTIVE = 1
-    STATION_CHOICES = (
-        # Nivel de operación
-        (ACTIVE, 'Activa'),
-        (INACTIVE, 'Inactiva'),
-    )
-    station_status = models.IntegerField(choices=STATION_CHOICES, default=ACTIVE) # NO HISTÓRICO
-
+    station_status = models.CharField(max_length=255, default="Rojo", blank=True, null=True, verbose_name="Station status (Verde, Amarillo o Rojo. Otros quedarán en gris)")
     def __str__(self):
         return self.name
     def get_last_alert_status(self):
