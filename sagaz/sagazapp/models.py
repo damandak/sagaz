@@ -60,8 +60,10 @@ class Lake(BaseModel):
     # Dynamic fields
     area = models.FloatField(blank=True, null=True, verbose_name="Area (square kilometers)") # km2 - NO HISTÓRICO
     volume = models.FloatField(blank=True, null=True, verbose_name="Water Volume (millions of cubic meters)") # water volume in millions of cubic meters - NO HISTÓRICO
-    warning = models.CharField(max_length=255, blank=True, null=True, verbose_name="Warning and description")
-    station_status = models.CharField(max_length=255, default="Rojo", blank=True, null=True, verbose_name="Station status (Verde, Amarillo o Rojo. Otros quedarán en gris)")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    station_status = models.CharField(max_length=255, default="Instalación Programada", blank=True, null=True, verbose_name="Station status (Ej: Operativa, Instalación Programada, Operativa sin Pluviómetro, etc)")
+    current_alert_status = models.CharField(max_length=255, default="Verde", blank=True, null=True, verbose_name="Current alert status (Debe empezar con 'Verde', 'Amarillo' o 'Rojo'. Otros quedarán en gris)")
+
     def __str__(self):
         return self.name
     def get_last_alert_status(self):
@@ -80,12 +82,10 @@ class LakeMeasurement(BaseModel):
     atmospheric_temperature = models.FloatField(blank=True, null=True, verbose_name="Atmospheric Temperature (Celsius)") # in Celsius
     precipitation = models.FloatField(blank=True, null=True, verbose_name="Precipitation (milimeters)") # in mm
 
-    GREEN = 0
-    YELLOW = 1
-    RED = 2
-    STATUS_CHOICES = (
-        (GREEN, 'Verde'),
-        (YELLOW, 'Amarilla'),
-        (RED, 'Roja'),
-    )
-    alert_status = models.IntegerField(choices=STATUS_CHOICES, blank=True, null=True) # HISTÓRICO
+    alert_status = models.CharField(max_length=255, blank=True, null=True, default="Verde (inicial)", verbose_name="Alert Status (Debe empezar con 'Verde', 'Amarillo' o 'Rojo'. Otros quedarán en gris)")
+
+    # update lake current_alert_status when changing alert_status
+    def save(self, *args, **kwargs):
+        super(LakeMeasurement, self).save(*args, **kwargs)
+        self.lake.current_alert_status = self.alert_status
+        self.lake.save()

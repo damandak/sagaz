@@ -7,7 +7,7 @@ class LakeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Lake
-        fields = ('id', 'image', 'name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'station_status')
+        fields = ('id', 'image', 'name','sagaz_id','country','region','lat','lon','altitude','area','volume', 'description', 'station_status', 'current_alert_status', 'updated_at')
 
     def create(self, validated_data):
         old_lake = Lake.objects.filter(sagaz_id=validated_data['sagaz_id']).first()
