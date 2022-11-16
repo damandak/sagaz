@@ -1,6 +1,7 @@
 from rest_framework import routers,serializers,viewsets
 from rest_framework.serializers import SerializerMethodField
 from .models import Lake,LakeMeasurement
+import math
 
 class LakeSerializer(serializers.ModelSerializer):
     sagaz_id = serializers.CharField(max_length=100, required=True)
@@ -40,15 +41,30 @@ class LakeMeasurementSerializer(serializers.ModelSerializer):
             return LakeMeasurement.objects.create(**validated_data)
         else:
             if 'water_level' in validated_data:
-                old_lake_m.water_level = validated_data['water_level']
+                if not math.isnan(validated_data['water_level']):
+                    old_lake_m.water_level = validated_data['water_level']
+                else:
+                    old_lake_m.water_level = None
             if 'water_temperature' in validated_data:
-                old_lake_m.water_temperature = validated_data['water_temperature']
+                if not math.isnan(validated_data['water_temperature']):
+                    old_lake_m.water_temperature = validated_data['water_temperature']
+                else:
+                    old_lake_m.water_temperature = None
             if 'atmospheric_pressure' in validated_data:
-                old_lake_m.atmospheric_pressure = validated_data['atmospheric_pressure']
+                if not math.isnan(validated_data['atmospheric_pressure']):
+                    old_lake_m.atmospheric_pressure = validated_data['atmospheric_pressure']
+                else:
+                    old_lake_m.atmospheric_pressure = None
             if 'atmospheric_temperature' in validated_data:
-                old_lake_m.atmospheric_temperature = validated_data['atmospheric_temperature']
+                if not math.isnan(validated_data['atmospheric_temperature']):
+                    old_lake_m.atmospheric_temperature = validated_data['atmospheric_temperature']
+                else:
+                    old_lake_m.atmospheric_temperature = None
             if 'precipitation' in validated_data:
-                old_lake_m.precipitation = validated_data['precipitation']
+                if not math.isnan(validated_data['precipitation']):
+                    old_lake_m.precipitation = validated_data['precipitation']
+                else:
+                    old_lake_m.precipitation = None
             if 'alert_status' in validated_data:
                 old_lake_m.alert_status = validated_data['alert_status']
             old_lake_m.save()
