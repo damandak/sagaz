@@ -2,6 +2,8 @@ from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
+import pytz
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -85,7 +87,8 @@ class LakeMeasurement(BaseModel):
     alert_status = models.CharField(max_length=255, blank=True, null=True, default="Verde (inicial)", verbose_name="Alert Status (Debe empezar con 'Verde', 'Amarillo' o 'Rojo'. Otros quedarán en gris)")
 
     def __str__(self) -> str:
-        return f"{self.date.strftime('%Y-%m-%d %H:%M')} - {self.lake.name}"
+        tz = pytz.timezone('America/Santiago')
+        return f"{self.date.astimezone(tz).strftime('%Y-%m-%d %H:%M')} - {self.lake.name}"
 
     # update lake current_alert_status when changing alert_status
     def save(self, *args, **kwargs):
