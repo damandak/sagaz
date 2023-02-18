@@ -4,6 +4,11 @@ from django.utils.translation import gettext_lazy as _
 from .managers import CustomUserManager
 import pytz
 
+# from django.core.mail import send_mail
+# from background_task import background
+# from asgiref.sync import sync_to_async
+# from twilio.rest import Client
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -74,6 +79,32 @@ class Lake(BaseModel):
     def get_health_status(self):
         return self.HEALTH_CHOICES[self.health_status][1]
 
+    # When saving, send alert by sms depending on current alert status
+    def save(self, *args, **kwargs):
+        super(Lake, self).save(*args, **kwargs)
+        # if it starts with Rojo
+        # if self.current_alert_status.startswith("Rojo"):
+        #     self.send_alert_by_sms()
+        #     self.send_alert_by_email()
+
+    # async def send_alert_by_sms(self):
+    #     # Function to send an SMS message
+    #     # client = Client(account_sid, auth_token)
+    #     # message = await client.messages.create(to=to, from_=from_number, body=body)
+    #     # return message
+    #     return True
+
+    # @background(schedule=60)
+    # def send_alert_by_email(self):
+    #     subject = 'SAGAZ - Alerta en ' + self.name
+    #     message = ('Alerta de GLOF en ' + self.name + ' en ' + self.region + ', ' + self.country + '.'
+    #         + 'La alerta es de nivel ' + self.current_alert_status + '.'
+    #         + 'Para más información, visite https://www.sagaz.org/lake/' + str(self.id))
+    #     from_email = 'damirmandakovic@gmail.com'
+    #     recipient_list = ['receiver@example.com']
+    #     send_mail(subject, message, from_email, recipient_list)
+    #     print("Email sent")
+
 class LakeMeasurement(BaseModel):
     lake = models.ForeignKey(Lake, on_delete=models.CASCADE)
     date = models.DateTimeField(blank=False, null=False)
@@ -93,5 +124,5 @@ class LakeMeasurement(BaseModel):
     # update lake current_alert_status when changing alert_status
     def save(self, *args, **kwargs):
         super(LakeMeasurement, self).save(*args, **kwargs)
-        self.lake.current_alert_status = self.alert_status
+        self.lake.current_alert_status = self.lake.get_last_alert_status()
         self.lake.save()

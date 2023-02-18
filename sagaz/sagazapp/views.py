@@ -113,6 +113,36 @@ class LakeMeasurementsViews(APIView):
     serializer = LakeMeasurementSerializer(measurements, many=True)
     # return the serialized lake measurements
     return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+  
+  def delete(self, request):
+    try:
+      # obtain the lake with the passed id.
+      lake = Lake.objects.get(sagaz_id=request.data['sagaz_id'])
+      lakemeasurement = LakeMeasurement.objects.filter(lake=lake, date=request.data['date'])
+      lakemeasurement.delete()
+    except:
+      # respond with a 404 error message
+      return Response({"status": "error", "data": "Problem with request, probably measurement not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"status": "success", "data": "Measurement " + str(request.data['sagaz_id']) + " " + str(request.data['date']) + " deleted"}, status=status.HTTP_200_OK)
 
-
-    
+  def patch(self, request):
+    try:
+      # obtain the lake with the passed id.
+      sagaz_id = request.data['sagaz_id']
+      new_data = request.data.copy()
+      if Lake.objects.filter(sagaz_id=sagaz_id).exists():
+        lake = Lake.objects.get(sagaz_id=sagaz_id)
+        prev_measurement = LakeMeasurement.objects.get(lake=lake, date=request.data['date'])
+        new_data['lake'] = lake.id
+        serializer = LakeMeasurementSerializer(instance=prev_measurement, data=new_data)
+        if serializer.is_valid():
+          serializer.save()
+          return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+        else:
+          return Response({"status": "error", "data": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+      else:
+        error_data_msg = "Lake with sagaz id '" + sagaz_id + "' does not exist"
+        return Response({"status": "error", "data": error_data_msg}, status=status.HTTP_400_BAD_REQUEST)
+    except:
+      # respond with a 404 error message
+      return Response({"status": "error", "data": "Problem with request, probably measurement not found"}, status=status.HTTP_404_NOT_FOUND)
