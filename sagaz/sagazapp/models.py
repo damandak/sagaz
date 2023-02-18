@@ -117,6 +117,9 @@ class LakeMeasurement(BaseModel):
 
     alert_status = models.CharField(max_length=255, blank=True, null=True, default="Verde (inicial)", verbose_name="Alert Status (Debe empezar con 'Verde', 'Amarillo' o 'Rojo'. Otros quedarán en gris)")
 
+    class Meta:
+        ordering = ['-date']
+        
     def __str__(self) -> str:
         tz = pytz.timezone('America/Santiago')
         return f"{self.date.astimezone(tz).strftime('%Y-%m-%d %H:%M')} - {self.lake.name}"
