@@ -118,12 +118,15 @@ class LakeMeasurementsViews(APIView):
     try:
       # obtain the lake with the passed id.
       lake = Lake.objects.get(sagaz_id=request.data['sagaz_id'])
-      lakemeasurement = LakeMeasurement.objects.filter(lake=lake, date=request.data['date'])
-      lakemeasurement.delete()
+      lakemeasurement = LakeMeasurement.objects.filter(lake=lake, date=request.data['date']).first()
+      if lakemeasurement is not None:
+        lakemeasurement.delete()
+        return Response({"status": "success", "data": "Measurement " + str(request.data['sagaz_id']) + " " + str(request.data['date']) + " deleted"}, status=status.HTTP_200_OK)
+      else:
+        return Response({"status": "error", "data": "Measurement " + str(request.data['sagaz_id']) + " " + str(request.data['date']) + " not found"}, status=status.HTTP_404_NOT_FOUND)
     except:
       # respond with a 404 error message
       return Response({"status": "error", "data": "Problem with request, probably measurement not found"}, status=status.HTTP_404_NOT_FOUND)
-    return Response({"status": "success", "data": "Measurement " + str(request.data['sagaz_id']) + " " + str(request.data['date']) + " deleted"}, status=status.HTTP_200_OK)
 
   def patch(self, request):
     try:
