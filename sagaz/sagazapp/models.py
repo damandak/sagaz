@@ -70,6 +70,7 @@ class Lake(BaseModel):
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     station_status = models.CharField(max_length=255, default="Instalación Programada", blank=True, null=True, verbose_name="Station status (Ej: Operativa, Instalación Programada, Operativa sin Pluviómetro, etc)")
     current_alert_status = models.CharField(max_length=255, default="Verde", blank=True, null=True, verbose_name="Current alert status (Debe empezar con 'Verde', 'Amarillo' o 'Rojo'. Otros quedarán en gris)")
+    last_data_date = models.DateTimeField(blank=True, null=True, verbose_name="Last data date")
 
     def __str__(self):
         return self.name
@@ -78,6 +79,14 @@ class Lake(BaseModel):
         return last_valid_measurement.alert_status
     def get_health_status(self):
         return self.HEALTH_CHOICES[self.health_status][1]
+    def calculate_last_data_date(self):
+        try:
+            last_valid_measurement = LakeMeasurement.objects.filter(lake=self).order_by('-date').first()
+            self.last_data_date = last_valid_measurement.date
+            self.save()
+        except:
+            self.last_data_date = None
+            self.save()
 
     # When saving, send alert by sms depending on current alert status
     def save(self, *args, **kwargs):
