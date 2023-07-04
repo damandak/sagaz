@@ -11,6 +11,9 @@ from .serializers import LakeSerializer, LakeMeasurementSerializer
 # Lake model
 from .models import Lake, LakeMeasurement
 
+import pandas as pd
+import io
+
 # Import datetime
 from datetime import datetime, timedelta
 
@@ -36,6 +39,8 @@ class LakeDetailView(APIView):
     try:
       # obtain the lake with the passed id.
       lake = Lake.objects.get(pk=pk)
+      lake.calculate_last_data_date()
+      lake.save()
     except:
       # respond with a 404 error message
       return HttpResponse(status=404)  
@@ -94,6 +99,8 @@ class LakeMeasurementsViews(APIView):
     try:
       # obtain the lake with the passed id.
       lake = Lake.objects.get(pk=pk)
+      lake.calculate_last_data_date()
+      lake.save()
       if interval == 'daily':
         measurements = LakeMeasurement.objects.filter(lake=lake).filter(date__gte=datetime.now() - timedelta(days=1)).order_by('date')
       elif interval == 'weekly':
@@ -111,8 +118,17 @@ class LakeMeasurementsViews(APIView):
       return HttpResponse(status=404)  
     # serialize the lake
     serializer = LakeMeasurementSerializer(measurements, many=True)
+
+    last_data_date = None
+    if lake.last_data_date:  # check if the date exists
+        last_data_date = lake.last_data_date.strftime('%d-%m-%Y')
+
     # return the serialized lake measurements
-    return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+    return Response({
+      "status": "success",
+      "data": serializer.data,
+      "last_data_date": last_data_date,
+    }, status=status.HTTP_200_OK)
   
   def delete(self, request):
     try:
@@ -149,3 +165,44 @@ class LakeMeasurementsViews(APIView):
     except:
       # respond with a 404 error message
       return Response({"status": "error", "data": "Problem with request, probably measurement not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class LakeMeasurementExport(APIView):
+  def get(self, request, pk, interval):
+    # Fetch the data from LakeMeasurement model
+    lake_measurements = LakeMeasurement.objects.filter(lake_id=pk)
+    if interval == "daily":
+        start_date = datetime.now() - timedelta(days=1)
+    elif interval == "weekly":
+        start_date = datetime.now() - timedelta(weeks=1)
+    elif interval == "biweekly":
+        start_date = datetime.now() - timedelta(weeks=2)
+    elif interval == "monthly":
+        start_date = datetime.now() - timedelta(days=31)
+    elif interval == "yearly":
+        start_date = datetime.now() - timedelta(days=365)
+    else:
+        start_date = None
+    if start_date is not None:
+      lake_measurements = lake_measurements.filter(date__gte=start_date)
+
+    def make_naive(dt):
+      try:
+          return dt.tz_convert(None)
+      except:
+          return dt
+    
+    # Transform the QuerySet to DataFrame
+    df = pd.DataFrame(lake_measurements.values())
+    df = df.applymap(make_naive)
+
+    csv_file = io.StringIO()
+    df.to_csv(csv_file, index=False)
+    csv_file.seek(0)
+
+    response = HttpResponse(csv_file.read(), content_type='text/csv')
+    # include date, lake and interval in the filename
+    filename = "lake_measurement_export_" + str(datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + "_" + str(pk) + "_" + str(interval) + ".csv"
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+
+    return response
+  
