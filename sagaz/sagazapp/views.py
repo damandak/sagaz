@@ -11,11 +11,13 @@ from .serializers import LakeSerializer, LakeMeasurementSerializer
 # Lake model
 from .models import Lake, LakeMeasurement
 
-import pandas as pd
 import io
+import csv
 
 # Import datetime
 from datetime import datetime, timedelta
+from django.utils.timezone import localtime
+
 
 from rest_framework.views import APIView
 from rest_framework_api_key.permissions import HasAPIKey
@@ -185,24 +187,26 @@ class LakeMeasurementExport(APIView):
     if start_date is not None:
       lake_measurements = lake_measurements.filter(date__gte=start_date)
 
-    def make_naive(dt):
-      try:
-          return dt.tz_convert(None)
-      except:
-          return dt
-    
-    # Transform the QuerySet to DataFrame
-    df = pd.DataFrame(lake_measurements.values())
-    df = df.applymap(make_naive)
-
-    csv_file = io.StringIO()
-    df.to_csv(csv_file, index=False)
-    csv_file.seek(0)
-
-    response = HttpResponse(csv_file.read(), content_type='text/csv')
-    # include date, lake and interval in the filename
+    response = HttpResponse(content_type='text/csv')
     filename = "lake_measurement_export_" + str(datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + "_" + str(pk) + "_" + str(interval) + ".csv"
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
+    writer = csv.writer(response)
+    # Write the header
+    writer.writerow(['id', 'lake_id', 'date', 'water_level', 'water_temperature', 'atmospheric_pressure', 'atmospheric_temperature', 'precipitation', 'alert_status'])
+    # Write data rows
+    for measurement in lake_measurements:
+        writer.writerow([
+            measurement.id,
+            measurement.lake_id,
+            localtime(measurement.date),  # Convert from timezone-aware to naive
+            measurement.water_level,
+            measurement.water_temperature,
+            measurement.atmospheric_pressure,
+            measurement.atmospheric_temperature,
+            measurement.precipitation,
+            measurement.alert_status
+        ])
+    
     return response
   
